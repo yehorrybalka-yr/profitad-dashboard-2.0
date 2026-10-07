@@ -1,4 +1,4 @@
-export type AppRoute = "/" | "/analysis" | "/inputs" | "/sales";
+export type AppRoute = "/" | "/analysis" | "/inputs" | "/sales" | "/settings";
 
 export interface NavItem {
   label: string;
@@ -14,6 +14,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Анализ", href: "/analysis", withProjects: true },
   { label: "Вводные", href: "/inputs" },
   { label: "Sales", href: "/sales", footer: true },
+  { label: "Настройки", href: "/settings", footer: true },
 ];
 
 /** Order used for page slide direction. */

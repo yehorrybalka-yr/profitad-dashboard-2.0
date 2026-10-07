@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { getPageTitle } from "@/config/navigation";
 import { MobileTabBar } from "./mobile-tab-bar";
 import { PageTransition } from "./page-transition";
@@ -27,9 +26,6 @@ export function AppShell({
             <h1 className="min-w-0 truncate text-base font-semibold tracking-[-0.04em] sm:text-lg lg:text-[22px]">
               {getPageTitle(pathname, projects)}
             </h1>
-            <div className="shrink-0">
-              <ThemeToggle />
-            </div>
           </header>
 
           <main className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-clip px-3 pt-3 pb-[calc(6.25rem+env(safe-area-inset-bottom))] sm:px-4 sm:pt-4 lg:px-2 lg:pt-0 lg:pb-3">
