@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+import { AppClerkProvider } from "@/components/auth/app-clerk-provider";
 import { APP_CONFIG } from "@/config/app";
-import { CLERK_APPEARANCE } from "@/lib/clerk-appearance";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
@@ -33,16 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-dvh font-sans">
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
-        <ClerkProvider
-          appearance={CLERK_APPEARANCE}
-          signInUrl="/sign-in"
-          signUpUrl="/sign-up"
-          signInFallbackRedirectUrl="/"
-          signUpFallbackRedirectUrl="/"
-          telemetry={false}
-        >
-          {children}
-        </ClerkProvider>
+        <AppClerkProvider>{children}</AppClerkProvider>
       </body>
     </html>
   );

@@ -43,7 +43,6 @@ export const getViewerState = cache(async (): Promise<ViewerState> => {
 });
 
 export async function requireViewer(): Promise<Viewer> {
-  await auth.protect();
   const state = await getViewerState();
   if (state.status === "signed-out") redirect("/sign-in");
   if (state.status === "no-access") redirect("/no-access");
