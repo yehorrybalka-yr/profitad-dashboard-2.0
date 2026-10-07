@@ -7,6 +7,11 @@ const currencyFmt = new Intl.NumberFormat(APP_CONFIG.locale, {
   currency: APP_CONFIG.currency,
   maximumFractionDigits: 2,
 });
+const wholeCurrencyFmt = new Intl.NumberFormat(APP_CONFIG.locale, {
+  style: "currency",
+  currency: APP_CONFIG.currency,
+  maximumFractionDigits: 0,
+});
 const percentFmt = new Intl.NumberFormat(APP_CONFIG.locale, {
   style: "percent",
   maximumFractionDigits: 0,
@@ -15,6 +20,7 @@ const dateFmt = new Intl.DateTimeFormat(APP_CONFIG.locale, { day: "numeric", mon
 
 export const formatNumber = (v: number) => numberFmt.format(v);
 export const formatCurrency = (v: number) => currencyFmt.format(v);
+export const formatWholeCurrency = (v: number) => wholeCurrencyFmt.format(v);
 export const formatPercent = (v: number) => percentFmt.format(v);
 export const formatDate = (iso: string) => dateFmt.format(new Date(iso));
 

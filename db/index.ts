@@ -7,7 +7,8 @@ function createDb() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error("DATABASE_URL is not set");
 
-  const pool = new Pool({ connectionString });
+  // pg already treats sslmode=require as verify-full; saying so explicitly silences its deprecation warning.
+  const pool = new Pool({ connectionString: connectionString.replace(/sslmode=require\b/, "sslmode=verify-full") });
   attachDatabasePool(pool);
   return drizzle(pool, { schema });
 }

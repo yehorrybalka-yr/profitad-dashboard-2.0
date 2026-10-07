@@ -17,7 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Дашборд", href: "/", section: "dashboard" },
   { label: "Анализ", href: "/analysis", section: "analysis", withProjects: true },
   { label: "Вводные", href: "/inputs", section: "inputs" },
-  { label: "Sales", href: "/sales", section: "sales", footer: true },
+  { label: "Sales", href: "/sales", section: "sales" },
   { label: "Настройки", href: "/settings", footer: true },
 ];
 
