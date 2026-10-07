@@ -1,17 +1,37 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ThemePicker } from "@/components/settings/theme-picker";
 import { Card } from "@/components/ui/card";
+import { requireViewer } from "@/lib/access/viewer";
 
 export const metadata: Metadata = { title: "Настройки" };
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const { permissions } = await requireViewer();
+
   return (
-    <Card className="min-w-0">
-      <h2 className="section-title">Оформление</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Выбор сохраняется на этом устройстве.</p>
-      <div className="mt-5">
-        <ThemePicker />
-      </div>
-    </Card>
+    <div className="flex flex-col gap-5">
+      <Card className="min-w-0">
+        <h2 className="section-title">Оформление</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Выбор сохраняется на этом устройстве.</p>
+        <div className="mt-5">
+          <ThemePicker />
+        </div>
+      </Card>
+
+      {permissions.canManageAccess && (
+        <Card className="flex min-w-0 flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="section-title">Доступы</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Кто видит дашборд, какие вкладки и проекты им доступны.
+            </p>
+          </div>
+          <Link href="/settings/access" className="btn-primary">
+            Управлять доступами
+          </Link>
+        </Card>
+      )}
+    </div>
   );
 }

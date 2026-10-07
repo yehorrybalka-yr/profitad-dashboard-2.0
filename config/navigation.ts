@@ -1,8 +1,12 @@
+import type { Section } from "@/lib/access/roles";
+
 export type AppRoute = "/" | "/analysis" | "/inputs" | "/sales" | "/settings";
 
 export interface NavItem {
   label: string;
   href: AppRoute;
+  /** Access section guarding this item; items without one are open to every signed-in user. */
+  section?: Section;
   /** Pinned to the bottom of the sidebar. */
   footer?: boolean;
   /** Renders the project list under this item. */
@@ -10,12 +14,16 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Дашборд", href: "/" },
-  { label: "Анализ", href: "/analysis", withProjects: true },
-  { label: "Вводные", href: "/inputs" },
-  { label: "Sales", href: "/sales", footer: true },
+  { label: "Дашборд", href: "/", section: "dashboard" },
+  { label: "Анализ", href: "/analysis", section: "analysis", withProjects: true },
+  { label: "Вводные", href: "/inputs", section: "inputs" },
+  { label: "Sales", href: "/sales", section: "sales", footer: true },
   { label: "Настройки", href: "/settings", footer: true },
 ];
+
+const EXTRA_TITLES: Record<string, string> = {
+  "/settings/access": "Доступы",
+};
 
 /** Order used for page slide direction. */
 export const ROUTE_ORDER: AppRoute[] = NAV_ITEMS.map((item) => item.href);
@@ -30,6 +38,7 @@ export function routeIndex(pathname: string) {
 }
 
 export function getPageTitle(pathname: string, projects: { id: string; name: string }[]) {
+  if (EXTRA_TITLES[pathname]) return EXTRA_TITLES[pathname];
   const projectMatch = pathname.match(/^\/analysis\/([^/]+)/);
   if (projectMatch) {
     return projects.find((p) => p.id === projectMatch[1])?.name ?? "Проект";

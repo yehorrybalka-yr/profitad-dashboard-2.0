@@ -2,10 +2,15 @@ import { StatusSummary } from "@/components/dashboard/status-summary";
 import { ProjectCard } from "@/components/projects/project-card";
 import { SectionTitle } from "@/components/ui/card";
 import { Placeholder } from "@/components/ui/page-header";
+import { requireSection } from "@/lib/access/viewer";
 import { getActiveProjects, getStatusSummary } from "@/lib/data";
 
 export default async function DashboardPage() {
-  const [summary, activeProjects] = await Promise.all([getStatusSummary(), getActiveProjects()]);
+  const { permissions } = await requireSection("dashboard");
+  const [summary, activeProjects] = await Promise.all([
+    getStatusSummary(permissions),
+    getActiveProjects(permissions),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">

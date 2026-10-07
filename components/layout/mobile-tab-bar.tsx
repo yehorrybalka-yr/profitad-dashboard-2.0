@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_ICONS } from "@/components/icons/nav-icons";
-import { NAV_ITEMS, isNavItemActive } from "@/config/navigation";
+import { isNavItemActive, type NavItem } from "@/config/navigation";
 import { cn } from "@/lib/cn";
 
-export function MobileTabBar() {
+export function MobileTabBar({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
 
   return (
@@ -15,7 +15,7 @@ export function MobileTabBar() {
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden"
     >
       <div className="glass pointer-events-auto mx-auto flex h-16 max-w-lg items-center justify-around rounded-full bg-card/90 px-2 shadow-[var(--shadow)] backdrop-blur-md">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const Icon = NAV_ICONS[item.href];
           const isActive = isNavItemActive(item.href, pathname);
           return (

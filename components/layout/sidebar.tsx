@@ -5,13 +5,13 @@ import { usePathname } from "next/navigation";
 import { NAV_ICONS } from "@/components/icons/nav-icons";
 import { SignalDot } from "@/components/ui/signal";
 import { APP_CONFIG } from "@/config/app";
-import { NAV_ITEMS, isNavItemActive, type NavItem } from "@/config/navigation";
+import { isNavItemActive, type NavItem } from "@/config/navigation";
 import { cn } from "@/lib/cn";
 import type { ProjectNavItem } from "./types";
 
-export function Sidebar({ projects }: { projects: ProjectNavItem[] }) {
-  const main = NAV_ITEMS.filter((item) => !item.footer);
-  const footer = NAV_ITEMS.filter((item) => item.footer);
+export function Sidebar({ items, projects }: { items: NavItem[]; projects: ProjectNavItem[] }) {
+  const main = items.filter((item) => !item.footer);
+  const footer = items.filter((item) => item.footer);
 
   return (
     <aside className="glass hidden shrink-0 flex-col overflow-hidden rounded-[28px] text-sidebar-foreground backdrop-blur-xl lg:sticky lg:top-3 lg:flex lg:h-[calc(100dvh-1.5rem)] lg:w-[248px]">

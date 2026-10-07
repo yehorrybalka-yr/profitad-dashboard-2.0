@@ -1,4 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { visibleProjects } from "@/lib/access/policy";
+import type { Permissions } from "@/lib/access/roles";
 import { paceLevel, summarizeStatuses, withStats } from "@/lib/domain/stats";
 import type { ProjectWithStats, StatusSummary } from "@/lib/domain/types";
 import type { DataSource } from "./source";
@@ -8,6 +10,7 @@ import { TAGS } from "./tags";
 /** Swap this for a real provider (DB, ad platforms, CRM) — nothing else has to change. */
 const source: DataSource = mockSource;
 
+/** Unscoped and cached for everyone; pages must narrow it with the viewer's permissions. */
 export async function getProjects(): Promise<ProjectWithStats[]> {
   "use cache";
   cacheLife("minutes");
@@ -27,13 +30,17 @@ export async function getProject(id: string): Promise<ProjectWithStats | null> {
   return project ? withStats(project, new Date()) : null;
 }
 
-export async function getActiveProjects() {
-  const projects = await getProjects();
+export async function getVisibleProjects(permissions: Permissions) {
+  return visibleProjects(permissions, await getProjects());
+}
+
+export async function getActiveProjects(permissions: Permissions) {
+  const projects = await getVisibleProjects(permissions);
   return projects.filter((p) => p.status === "active");
 }
 
-export async function getStatusSummary(): Promise<StatusSummary> {
-  return summarizeStatuses(await getProjects());
+export async function getStatusSummary(permissions: Permissions): Promise<StatusSummary> {
+  return summarizeStatuses(await getVisibleProjects(permissions));
 }
 
 export async function getProjectNav() {

@@ -5,6 +5,8 @@ import { MetricsGrid } from "@/components/projects/metrics-grid";
 import { PlanFact } from "@/components/projects/plan-fact";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { canViewProject, canViewSection } from "@/lib/access/policy";
+import { getViewerState, requireProject } from "@/lib/access/viewer";
 import { getProject, getProjects } from "@/lib/data";
 import { formatDate } from "@/lib/format";
 
@@ -17,12 +19,18 @@ export async function generateMetadata({
   params,
 }: PageProps<"/analysis/[projectId]">): Promise<Metadata> {
   const { projectId } = await params;
-  const project = await getProject(projectId);
+  const state = await getViewerState();
+  const allowed =
+    state.status === "ok" &&
+    canViewSection(state.viewer.permissions, "analysis") &&
+    canViewProject(state.viewer.permissions, projectId);
+  const project = allowed ? await getProject(projectId) : null;
   return { title: project?.name ?? "Проект" };
 }
 
 export default async function ProjectPage({ params }: PageProps<"/analysis/[projectId]">) {
   const { projectId } = await params;
+  await requireProject(projectId);
   const project = await getProject(projectId);
   if (!project) notFound();
 
