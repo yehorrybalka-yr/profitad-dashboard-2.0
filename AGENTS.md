@@ -7,3 +7,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Workflow
+
+After every change: `npm run build` must pass, then commit and push to `origin main`
+(GitHub: yehorrybalka-yr/profitad-dashboard-2.0), then deploy with `npx vercel deploy --prod --yes`
+(project: yehor-rybalkas-projects/profitad-dashboard-2.0).
