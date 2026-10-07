@@ -1,11 +1,6 @@
 import { cn } from "@/lib/cn";
-import { paceLevel, type PaceLevel } from "@/lib/domain/stats";
-
-const LEVEL_CLASSES: Record<PaceLevel, string> = {
-  good: "bg-emerald-500",
-  warning: "bg-amber-500",
-  bad: "bg-rose-500",
-};
+import { paceLevel } from "@/lib/domain/stats";
+import { SIGNAL_BG, SIGNAL_TEXT } from "./signal";
 
 interface ProgressBarProps {
   /** 0..n, clamped to 1 visually */
@@ -14,17 +9,26 @@ interface ProgressBarProps {
   marker?: number;
   /** Colors the bar by pace; defaults to the value itself. */
   pace?: number;
+  className?: string;
 }
 
-export function ProgressBar({ value, marker, pace = value }: ProgressBarProps) {
-  const width = `${Math.min(value, 1) * 100}%`;
+export function ProgressBar({ value, marker, pace = value, className }: ProgressBarProps) {
+  const level = paceLevel(pace);
   return (
-    <div className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-100">
-      <div className={cn("h-full rounded-full", LEVEL_CLASSES[paceLevel(pace)])} style={{ width }} />
+    <div className={cn("relative h-2 w-full rounded-full bg-muted", className)}>
+      <div
+        className={cn(
+          "signal-glow h-full rounded-full transition-[width] duration-500",
+          SIGNAL_BG[level],
+          SIGNAL_TEXT[level],
+        )}
+        style={{ width: `${Math.min(value, 1) * 100}%` }}
+      />
       {marker !== undefined && (
         <div
-          className="absolute top-0 h-full w-0.5 bg-zinc-900/40"
+          className="absolute -top-1 h-4 w-0.5 rounded-full bg-foreground/40"
           style={{ left: `${Math.min(marker, 1) * 100}%` }}
+          title="Сколько периода прошло"
           aria-hidden
         />
       )}

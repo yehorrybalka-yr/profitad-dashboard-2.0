@@ -1,22 +1,8 @@
-export function PageHeader({
-  title,
-  children,
-}: {
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <header className="mb-8 flex flex-wrap items-center gap-4">
-      <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-      {children}
-    </header>
-  );
-}
-
 export function Placeholder({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted">
-      {children}
-    </div>
+    <section className="rounded-[var(--radius)] bg-card p-8 shadow-[var(--shadow)]">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Soon</p>
+      <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground">{children}</p>
+    </section>
   );
 }

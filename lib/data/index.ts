@@ -1,5 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { summarizeStatuses, withStats } from "@/lib/domain/stats";
+import { paceLevel, summarizeStatuses, withStats } from "@/lib/domain/stats";
 import type { ProjectWithStats, StatusSummary } from "@/lib/domain/types";
 import type { DataSource } from "./source";
 import { mockSource } from "./sources/mock";
@@ -38,5 +38,9 @@ export async function getStatusSummary(): Promise<StatusSummary> {
 
 export async function getProjectNav() {
   const projects = await getProjects();
-  return projects.map(({ id, name }) => ({ id, name }));
+  return projects.map(({ id, name, status, stats }) => ({
+    id,
+    name,
+    signal: status === "active" ? paceLevel(stats.pace) : null,
+  }));
 }

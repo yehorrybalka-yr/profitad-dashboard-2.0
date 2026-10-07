@@ -1,46 +1,33 @@
-import { Card } from "@/components/ui/card";
+import { Card, StatTile } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { Delta, SIGNAL_TEXT } from "@/components/ui/signal";
+import { cn } from "@/lib/cn";
+import { paceLevel } from "@/lib/domain/stats";
 import type { ProjectWithStats } from "@/lib/domain/types";
 import { formatCurrency, formatPercent } from "@/lib/format";
-
-function Item({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="min-w-0">
-      <div className="text-xs uppercase tracking-wider text-muted">{label}</div>
-      <div className="mt-1 truncate text-lg font-semibold tabular-nums">{value}</div>
-      {hint && <div className="text-xs text-muted">{hint}</div>}
-    </div>
-  );
-}
 
 export function KpiStrip({ project }: { project: ProjectWithStats }) {
   const { kpi, stats } = project;
   const cpaPlan = kpi.cpaPlan;
-  const cpaDelta =
-    cpaPlan && stats.cpaFact !== null ? (stats.cpaFact - cpaPlan) / cpaPlan : null;
+  const cpaDelta = cpaPlan && stats.cpaFact !== null ? (stats.cpaFact - cpaPlan) / cpaPlan : null;
+  const level = paceLevel(stats.pace);
 
   return (
-    <Card className="grid grid-cols-2 gap-6 md:grid-cols-4">
-      <Item label="Цель" value={project.goal} />
-      <Item label="CPA план" value={cpaPlan ? formatCurrency(cpaPlan) : "—"} />
-      <Item
-        label="CPA факт"
-        value={stats.cpaFact !== null ? formatCurrency(stats.cpaFact) : "—"}
-        hint={
-          cpaDelta !== null
-            ? `${cpaDelta > 0 ? "+" : ""}${formatPercent(cpaDelta)} к плану`
-            : undefined
-        }
-      />
-      <div>
-        <Item
-          label="Выполнение · темп"
-          value={`${formatPercent(stats.progress)} · ${formatPercent(stats.pace)}`}
-        />
-        <div className="mt-2">
-          <ProgressBar value={stats.progress} marker={stats.elapsed} pace={stats.pace} />
+    <Card className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <StatTile label="Цель">{project.goal}</StatTile>
+      <StatTile label="CPA план">{cpaPlan ? formatCurrency(cpaPlan) : "—"}</StatTile>
+      <StatTile label="CPA факт">
+        <div className="flex flex-wrap items-center gap-2">
+          {stats.cpaFact !== null ? formatCurrency(stats.cpaFact) : "—"}
+          {cpaDelta !== null ? <Delta value={cpaDelta} goodWhen="down" /> : null}
         </div>
-      </div>
+      </StatTile>
+      <StatTile label="Выполнение · темп">
+        <span className={cn(SIGNAL_TEXT[level])}>
+          {formatPercent(stats.progress)} · {formatPercent(stats.pace)}
+        </span>
+        <ProgressBar className="mt-2" value={stats.progress} marker={stats.elapsed} pace={stats.pace} />
+      </StatTile>
     </Card>
   );
 }

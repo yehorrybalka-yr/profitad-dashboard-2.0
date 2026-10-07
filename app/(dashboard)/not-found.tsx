@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <Placeholder>
       Страница не найдена.{" "}
-      <Link href="/" className="text-accent hover:underline">
+      <Link href="/" className="font-semibold text-foreground hover:underline">
         На дашборд
       </Link>
     </Placeholder>

@@ -2,12 +2,20 @@ import { cn } from "@/lib/cn";
 import { STATUS_META, type StatusTone } from "@/lib/domain/statuses";
 import type { ProjectStatus } from "@/lib/domain/types";
 
-const TONE_CLASSES: Record<StatusTone, string> = {
-  green: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  amber: "bg-amber-50 text-amber-700 ring-amber-200",
-  blue: "bg-sky-50 text-sky-700 ring-sky-200",
-  red: "bg-rose-50 text-rose-700 ring-rose-200",
-  gray: "bg-zinc-100 text-zinc-600 ring-zinc-200",
+export const TONE_CLASSES: Record<StatusTone, string> = {
+  green: "bg-positive/12 text-positive",
+  amber: "bg-warning/14 text-warning",
+  blue: "bg-info/14 text-info",
+  red: "bg-negative/12 text-negative",
+  gray: "bg-muted text-muted-foreground",
+};
+
+export const TONE_DOT: Record<StatusTone, string> = {
+  green: "bg-positive",
+  amber: "bg-warning",
+  blue: "bg-info",
+  red: "bg-negative",
+  gray: "bg-muted-foreground",
 };
 
 export function StatusBadge({ status }: { status: ProjectStatus }) {
@@ -15,10 +23,11 @@ export function StatusBadge({ status }: { status: ProjectStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tracking-[-0.01em]",
         TONE_CLASSES[meta.tone],
       )}
     >
+      <span className={cn("size-1.5 rounded-full", TONE_DOT[meta.tone])} aria-hidden />
       {meta.label}
     </span>
   );
