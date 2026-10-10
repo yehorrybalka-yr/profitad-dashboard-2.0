@@ -6,24 +6,33 @@ export const SIGNAL_TEXT: Record<PaceLevel, string> = {
   good: "text-positive",
   warning: "text-warning",
   bad: "text-negative",
+  none: "text-muted-foreground",
 };
 
 export const SIGNAL_BG: Record<PaceLevel, string> = {
   good: "bg-positive",
   warning: "bg-warning",
   bad: "bg-negative",
+  none: "bg-muted-foreground/40",
 };
 
 export const SIGNAL_SOFT: Record<PaceLevel, string> = {
   good: "bg-positive/12 text-positive",
   warning: "bg-warning/14 text-warning",
   bad: "bg-negative/12 text-negative",
+  none: "bg-muted text-muted-foreground",
 };
 
 export function SignalDot({ level, className }: { level: PaceLevel; className?: string }) {
   return (
     <span
-      className={cn("signal-glow size-2 shrink-0 rounded-full", SIGNAL_BG[level], SIGNAL_TEXT[level], className)}
+      className={cn(
+        "size-2 shrink-0 rounded-full",
+        level !== "none" && "signal-glow",
+        SIGNAL_BG[level],
+        SIGNAL_TEXT[level],
+        className,
+      )}
       aria-hidden
     />
   );

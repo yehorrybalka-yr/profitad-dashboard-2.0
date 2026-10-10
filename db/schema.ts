@@ -6,10 +6,12 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
 import type { AssignableRole, Section } from "@/lib/access/roles";
+import type { Kpi, ProjectStatus, TrafficPlatform, TrafficSource } from "@/lib/domain/types";
 import type { DealStage } from "@/lib/sales/stages";
 
 /** Access is bound to the account email, so it can be granted before the first sign-in. */
@@ -52,3 +54,49 @@ export const deals = pgTable(
 );
 
 export type DealRow = typeof deals.$inferSelect;
+
+export const projects = pgTable("projects", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  status: text("status").$type<ProjectStatus>().notNull(),
+  goal: text("goal").notNull().default(""),
+  periodStart: date("period_start").notNull(),
+  periodEnd: date("period_end").notNull(),
+  kpis: jsonb("kpis").$type<Kpi[]>().notNull().default([]),
+  sources: jsonb("sources").$type<TrafficSource[]>().notNull().default([]),
+  notes: text("notes").notNull().default(""),
+  position: integer("position").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedBy: text("updated_by"),
+});
+
+export type ProjectRow = typeof projects.$inferSelect;
+
+/**
+ * One row per campaign per day, written by the ad-platform sync.
+ * Sales and revenue stay null until a CRM source is connected.
+ */
+export const adMetricsDaily = pgTable(
+  "ad_metrics_daily",
+  {
+    date: date("date").notNull(),
+    platform: text("platform").$type<TrafficPlatform>().notNull(),
+    accountId: text("account_id").notNull(),
+    campaignId: text("campaign_id").notNull(),
+    campaignName: text("campaign_name").notNull().default(""),
+    projectId: text("project_id").notNull(),
+    spend: doublePrecision("spend").notNull().default(0),
+    impressions: integer("impressions").notNull().default(0),
+    clicks: integer("clicks").notNull().default(0),
+    leads: doublePrecision("leads").notNull().default(0),
+    subscribers: doublePrecision("subscribers").notNull().default(0),
+    sales: doublePrecision("sales"),
+    revenue: doublePrecision("revenue"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.date, t.platform, t.accountId, t.campaignId] }),
+    index("ad_metrics_project_date_idx").on(t.projectId, t.date),
+  ],
+);

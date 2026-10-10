@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Placeholder } from "@/components/ui/page-header";
+import { ProjectsInputs } from "@/components/inputs/projects-inputs";
 import { requireSection } from "@/lib/access/viewer";
+import { getVisibleProjects } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Вводные" };
 
 export default async function InputsPage() {
   const { permissions } = await requireSection("inputs");
+  const projects = await getVisibleProjects(permissions);
 
   return (
     <div className="flex flex-col gap-3">
@@ -14,7 +16,21 @@ export default async function InputsPage() {
           Режим просмотра: редактирование «Вводных» недоступно для вашего уровня доступа.
         </p>
       )}
-      <Placeholder>Проекты, воронки и офферы — раздел в разработке.</Placeholder>
+      <ProjectsInputs
+        projects={projects.map(({ id, name, status, goal, period, kpis, sources, notes }) => ({
+          id,
+          name,
+          status,
+          goal,
+          period,
+          kpis,
+          sources,
+          notes,
+        }))}
+        canEdit={permissions.canEditInputs}
+        canCreate={permissions.canEditInputs && permissions.projects === "all"}
+        canDelete={permissions.canManageAccess}
+      />
     </div>
   );
 }

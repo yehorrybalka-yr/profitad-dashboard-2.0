@@ -3,12 +3,13 @@ import { SIGNAL_TEXT } from "@/components/ui/signal";
 import { cn } from "@/lib/cn";
 import { METRICS } from "@/lib/domain/metrics";
 import { paceLevel } from "@/lib/domain/stats";
-import type { ProjectWithStats } from "@/lib/domain/types";
-import { formatNumber, formatPercent } from "@/lib/format";
+import type { KpiStats } from "@/lib/domain/types";
+import { formatMetric, formatPercent } from "@/lib/format";
 
-export function PlanFact({ project }: { project: ProjectWithStats }) {
-  const { kpi, stats } = project;
-  const level = paceLevel(stats.pace);
+export function PlanFact({ result, elapsed }: { result: KpiStats; elapsed: number }) {
+  const { kpi } = result;
+  const level = paceLevel(result.pace);
+  const format = METRICS[kpi.metric].format;
 
   return (
     <div className="flex flex-col gap-3">
@@ -18,20 +19,24 @@ export function PlanFact({ project }: { project: ProjectWithStats }) {
             План / факт · {METRICS[kpi.metric].label.toLowerCase()}
           </p>
           <p className="mt-1 text-2xl font-semibold tracking-[-0.045em] tabular-nums">
-            {formatNumber(stats.fact)}
-            <span className="text-muted-foreground"> / {formatNumber(kpi.plan)}</span>
+            {formatMetric(result.fact, format)}
+            <span className="text-muted-foreground"> / {formatMetric(kpi.plan, format)}</span>
           </p>
         </div>
         <p className={cn("text-2xl font-semibold tracking-[-0.045em] tabular-nums", SIGNAL_TEXT[level])}>
-          {formatPercent(stats.progress)}
+          {result.progress === null ? "—" : formatPercent(result.progress)}
         </p>
       </div>
-      <ProgressBar value={stats.progress} marker={stats.elapsed} pace={stats.pace} />
+      <ProgressBar value={result.progress ?? 0} marker={elapsed} pace={result.pace} />
       <div className="flex justify-between text-xs text-muted-foreground tabular-nums">
-        <span>Прошло {formatPercent(stats.elapsed)} периода</span>
-        <span>
-          Темп <span className={cn("font-semibold", SIGNAL_TEXT[level])}>{formatPercent(stats.pace)}</span>
-        </span>
+        <span>Прошло {formatPercent(elapsed)} периода</span>
+        {result.pace === null ? (
+          <span>{result.kpi.plan ? "Нет данных" : "План не задан"}</span>
+        ) : (
+          <span>
+            Темп <span className={cn("font-semibold", SIGNAL_TEXT[level])}>{formatPercent(result.pace)}</span>
+          </span>
+        )}
       </div>
     </div>
   );

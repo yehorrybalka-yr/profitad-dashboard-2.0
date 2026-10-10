@@ -20,7 +20,10 @@ export function MetricsGrid({ metrics }: { metrics: Metrics }) {
   return (
     <Card className="min-w-0">
       <h2 className="section-title">Метрики</h2>
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+      <p className="mt-1 text-xs text-muted-foreground">
+        За период проекта. Продажи и выручка появятся после подключения CRM.
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
         {items.map((item) => (
           <StatTile key={item.key} label={item.label}>
             {item.value}

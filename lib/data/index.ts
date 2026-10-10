@@ -4,11 +4,11 @@ import type { Permissions } from "@/lib/access/roles";
 import { paceLevel, summarizeStatuses, withStats } from "@/lib/domain/stats";
 import type { ProjectWithStats, StatusSummary } from "@/lib/domain/types";
 import type { DataSource } from "./source";
-import { mockSource } from "./sources/mock";
+import { dbSource } from "./sources/db";
 import { TAGS } from "./tags";
 
-/** Swap this for a real provider (DB, ad platforms, CRM) — nothing else has to change. */
-const source: DataSource = mockSource;
+/** Swap this for another provider — nothing else has to change. */
+const source: DataSource = dbSource;
 
 /** Unscoped and cached for everyone; pages must narrow it with the viewer's permissions. */
 export async function getProjects(): Promise<ProjectWithStats[]> {
@@ -48,6 +48,6 @@ export async function getProjectNav() {
   return projects.map(({ id, name, status, stats }) => ({
     id,
     name,
-    signal: status === "active" ? paceLevel(stats.pace) : null,
+    signal: status === "active" ? paceLevel(stats.primary?.pace) : null,
   }));
 }

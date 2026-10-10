@@ -4,9 +4,10 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Delta, SIGNAL_TEXT } from "@/components/ui/signal";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/cn";
+import { METRICS } from "@/lib/domain/metrics";
 import { paceLevel } from "@/lib/domain/stats";
 import type { ProjectWithStats } from "@/lib/domain/types";
-import { formatNumber, formatPercent } from "@/lib/format";
+import { formatMetric, formatPercent } from "@/lib/format";
 
 export function ProjectsTable({ projects }: { projects: ProjectWithStats[] }) {
   return (
@@ -25,7 +26,8 @@ export function ProjectsTable({ projects }: { projects: ProjectWithStats[] }) {
           </thead>
           <tbody>
             {projects.map((p) => {
-              const level = paceLevel(p.stats.pace);
+              const primary = p.stats.primary;
+              const level = paceLevel(primary?.pace);
               return (
                 <tr key={p.id} className="group">
                   <td className="rounded-l-[18px] bg-background/70 px-4 py-3 font-semibold tracking-[-0.02em] transition-colors group-hover:bg-muted">
@@ -37,24 +39,39 @@ export function ProjectsTable({ projects }: { projects: ProjectWithStats[] }) {
                     <StatusBadge status={p.status} />
                   </td>
                   <td className="bg-background/70 px-4 py-3 tabular-nums transition-colors group-hover:bg-muted">
-                    <span className="font-semibold">{formatNumber(p.stats.fact)}</span>
-                    <span className="text-muted-foreground"> / {formatNumber(p.kpi.plan)}</span>
+                    {p.stats.results.length === 0 && <span className="text-muted-foreground">—</span>}
+                    {p.stats.results.map((r) => {
+                      const format = METRICS[r.kpi.metric].format;
+                      return (
+                        <p key={r.kpi.metric} className="whitespace-nowrap">
+                          <span className="font-semibold">{formatMetric(r.fact, format)}</span>
+                          <span className="text-muted-foreground">
+                            {" "}
+                            / {formatMetric(r.kpi.plan, format)} · {METRICS[r.kpi.metric].label.toLowerCase()}
+                          </span>
+                        </p>
+                      );
+                    })}
                   </td>
                   <td className="bg-background/70 px-4 py-3 text-muted-foreground transition-colors group-hover:bg-muted">
-                    {p.goal}
+                    {p.goal || "—"}
                   </td>
                   <td className="rounded-r-[18px] bg-background/70 px-4 py-3 transition-colors group-hover:bg-muted">
                     <div className="flex items-center justify-between gap-2 text-xs tabular-nums">
                       <span className={cn("font-semibold", SIGNAL_TEXT[level])}>
-                        {formatPercent(p.stats.progress)}
+                        {primary?.progress != null
+                          ? formatPercent(primary.progress)
+                          : primary?.kpi.plan
+                            ? "Нет данных"
+                            : "План не задан"}
                       </span>
-                      <Delta value={p.stats.pace - 1} />
+                      {primary?.pace != null && <Delta value={primary.pace - 1} />}
                     </div>
                     <ProgressBar
                       className="mt-2"
-                      value={p.stats.progress}
+                      value={primary?.progress ?? 0}
                       marker={p.stats.elapsed}
-                      pace={p.stats.pace}
+                      pace={primary?.pace ?? null}
                     />
                   </td>
                 </tr>

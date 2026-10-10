@@ -1,4 +1,4 @@
-import { DERIVED_METRICS, METRICS } from "@/lib/domain/metrics";
+import { DERIVED_METRICS, METRICS, PLATFORM_LABELS } from "@/lib/domain/metrics";
 import { STATUS_META } from "@/lib/domain/statuses";
 import type { MetricKey, ProjectWithStats } from "@/lib/domain/types";
 
@@ -22,19 +22,24 @@ export function buildProjectContext(project: ProjectWithStats) {
     status: STATUS_META[project.status].label,
     goal: project.goal,
     period: project.period,
-    kpi: {
-      metric: METRICS[project.kpi.metric].label,
-      plan: project.kpi.plan,
-      fact: project.stats.fact,
-      progress: project.stats.progress,
-      periodElapsed: project.stats.elapsed,
-      forecast: project.stats.forecast,
-      pace: project.stats.pace,
-      cpaPlan: project.kpi.cpaPlan ?? null,
-      cpaFact: project.stats.cpaFact,
-    },
+    periodElapsed: project.stats.elapsed,
+    trafficSources: project.sources.map((s) => ({
+      platform: PLATFORM_LABELS[s.platform],
+      connected: Boolean(s.accountId),
+    })),
+    results: project.stats.results.map((r) => ({
+      metric: METRICS[r.kpi.metric].label,
+      plan: r.kpi.plan,
+      fact: r.fact,
+      progress: r.progress,
+      forecast: r.forecast,
+      pace: r.pace,
+      cpaPlan: r.kpi.cpaPlan,
+      cpaFact: r.cpaFact,
+    })),
     metrics: raw,
     derivedMetrics: derived,
+    notes: project.notes,
   };
 }
 

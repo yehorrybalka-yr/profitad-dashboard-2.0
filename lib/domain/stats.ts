@@ -1,4 +1,7 @@
 import type {
+  Kpi,
+  KpiStats,
+  Metrics,
   Project,
   ProjectStats,
   ProjectWithStats,
@@ -11,25 +14,32 @@ const clamp = (value: number, min: number, max: number) =>
 
 const safeDivide = (a: number, b: number) => (b === 0 ? 0 : a / b);
 
-export function computeStats(project: Project, now: Date): ProjectStats {
-  const { kpi, metrics, period } = project;
+function computeKpiStats(kpi: Kpi, metrics: Metrics, elapsed: number): KpiStats {
   const fact = metrics[kpi.metric] ?? 0;
-
-  const start = Date.parse(period.start);
-  const end = Date.parse(period.end);
-  const elapsed = clamp(safeDivide(now.getTime() - start, end - start), 0, 1);
-
   const forecast = elapsed > 0 ? fact / elapsed : 0;
+  const hasData = metrics[kpi.metric] !== undefined;
+  const hasPlan = kpi.plan !== null && kpi.plan > 0;
+  const canJudge = hasData && hasPlan;
   const spend = metrics.spend;
 
   return {
+    kpi,
     fact,
-    progress: safeDivide(fact, kpi.plan),
-    elapsed,
     forecast,
-    pace: safeDivide(forecast, kpi.plan),
+    progress: canJudge ? fact / kpi.plan! : null,
+    pace: canJudge ? forecast / kpi.plan! : null,
     cpaFact: spend !== undefined && fact > 0 ? spend / fact : null,
   };
+}
+
+export function computeStats(project: Project, now: Date): ProjectStats {
+  const start = Date.parse(project.period.start);
+  // The end date is inclusive: the period lasts until the end of that day.
+  const end = Date.parse(project.period.end) + 86_400_000;
+  const elapsed = clamp(safeDivide(now.getTime() - start, end - start), 0, 1);
+  const results = project.kpis.map((kpi) => computeKpiStats(kpi, project.metrics, elapsed));
+
+  return { elapsed, results, primary: results[0] ?? null };
 }
 
 export function withStats(project: Project, now: Date): ProjectWithStats {
@@ -44,9 +54,11 @@ export function summarizeStatuses(projects: Project[]): StatusSummary {
   return summary;
 }
 
-export type PaceLevel = "good" | "warning" | "bad";
+/** "none" = nothing to judge yet (no plan set or no synced data). */
+export type PaceLevel = "good" | "warning" | "bad" | "none";
 
-export function paceLevel(pace: number): PaceLevel {
+export function paceLevel(pace: number | null | undefined): PaceLevel {
+  if (pace === null || pace === undefined) return "none";
   if (pace >= 1) return "good";
   if (pace >= 0.85) return "warning";
   return "bad";

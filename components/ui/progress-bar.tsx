@@ -7,8 +7,8 @@ interface ProgressBarProps {
   value: number;
   /** Share of the period elapsed, rendered as a marker. */
   marker?: number;
-  /** Colors the bar by pace; defaults to the value itself. */
-  pace?: number;
+  /** Colors the bar by pace; defaults to the value itself, null = neutral. */
+  pace?: number | null;
   className?: string;
 }
 
@@ -18,7 +18,8 @@ export function ProgressBar({ value, marker, pace = value, className }: Progress
     <div className={cn("relative h-2 w-full rounded-full bg-muted", className)}>
       <div
         className={cn(
-          "signal-glow h-full rounded-full transition-[width] duration-500",
+          "h-full rounded-full transition-[width] duration-500",
+          level !== "none" && "signal-glow",
           SIGNAL_BG[level],
           SIGNAL_TEXT[level],
         )}

@@ -1,4 +1,4 @@
-import type { MetricKey, Metrics } from "./types";
+import type { MetricKey, Metrics, TrafficPlatform } from "./types";
 
 export type MetricFormat = "number" | "currency" | "percent";
 
@@ -12,6 +12,7 @@ export const METRICS: Record<MetricKey, MetricDefinition> = {
   impressions: { label: "Показы", format: "number" },
   clicks: { label: "Клики", format: "number" },
   leads: { label: "Лиды", format: "number" },
+  subscribers: { label: "Подписчики", format: "number" },
   sales: { label: "Продажи", format: "number" },
   revenue: { label: "Выручка", format: "currency" },
 };
@@ -29,6 +30,13 @@ export const DERIVED_METRICS: DerivedMetric[] = [
   { key: "ctr", label: "CTR", format: "percent", compute: (m) => ratio(m.clicks, m.impressions) },
   { key: "cpc", label: "CPC", format: "currency", compute: (m) => ratio(m.spend, m.clicks) },
   { key: "cpl", label: "CPL", format: "currency", compute: (m) => ratio(m.spend, m.leads) },
+  { key: "cps", label: "Цена подписчика", format: "currency", compute: (m) => ratio(m.spend, m.subscribers) },
   { key: "cr", label: "CR лид → продажа", format: "percent", compute: (m) => ratio(m.sales, m.leads) },
   { key: "roas", label: "ROAS", format: "percent", compute: (m) => ratio(m.revenue, m.spend) },
 ];
+
+export const PLATFORM_LABELS: Record<TrafficPlatform, string> = {
+  meta: "Meta Ads",
+  google: "Google Ads",
+  tiktok: "TikTok Ads",
+};
