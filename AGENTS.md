@@ -11,5 +11,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Workflow
 
 After every change: `npm run build` must pass, then commit and push to `origin main`
-(GitHub: yehorrybalka-yr/profitad-dashboard-2.0), then deploy with `npx vercel deploy --prod --yes`
+(GitHub: adscontrolteam/profitad-dashboard-2.0), then deploy with `npx vercel deploy --prod --yes`
 (project: yehor-rybalkas-projects/profitad-dashboard-2.0).
